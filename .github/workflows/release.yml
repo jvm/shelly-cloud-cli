@@ -53,11 +53,13 @@ jobs:
             echo "sha256=${sha256}"
           } >> "$GITHUB_OUTPUT"
       - name: Upload GitHub release artifacts
-        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
-        with:
-          files: |
-            *.tgz
-            checksums.txt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" ./*.tgz checksums.txt \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "Release ${GITHUB_REF_NAME}"
       - name: Publish to npm with Trusted Publishing
         run: npm publish
   homebrew:
