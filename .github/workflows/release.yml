@@ -17,6 +17,8 @@ jobs:
       contents: write # Required to create/update the GitHub release.
       id-token: write # Required for npm Trusted Publishing/OIDC.
       attestations: write # Reserved for release artifact attestations.
+    env:
+      GH_TOKEN: ${{ secrets.RELEASE_TOKEN != '' && secrets.RELEASE_TOKEN || github.token }}
     outputs:
       version: ${{ steps.meta.outputs.version }}
       tarball: ${{ steps.meta.outputs.tarball }}
