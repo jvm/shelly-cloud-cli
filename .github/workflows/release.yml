@@ -32,8 +32,9 @@ jobs:
           bun-version: 1.3.14
       - uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903
         with:
-          node-version: '22'
-          registry-url: https://registry.npmjs.org
+          node-version: '24'
+          package-manager-cache: false
+      - run: npm install -g npm@11.6.2
       - run: bun install --frozen-lockfile
       - run: bun run typecheck
       - run: bun test
@@ -69,7 +70,7 @@ jobs:
               --notes "Release ${GITHUB_REF_NAME}"
           fi
       - name: Publish to npm with Trusted Publishing
-        run: npm publish
+        run: env -u NODE_AUTH_TOKEN npm publish --provenance
   homebrew:
     name: Open Homebrew tap pull request
     needs: publish
