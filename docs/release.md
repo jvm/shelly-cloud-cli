@@ -44,8 +44,8 @@ The v1 formula is Node-based. It installs the GitHub release npm tarball with Ho
 Generate a local formula preview:
 
 ```bash
-node scripts/homebrew-formula.mjs 0.1.5 \
-  https://github.com/jvm/shelly-cloud-cli/releases/download/v0.1.5/shelly-cloud-cli-0.1.5.tgz \
+node scripts/homebrew-formula.mjs 0.1.6 \
+  https://github.com/jvm/shelly-cloud-cli/releases/download/v0.1.6/shelly-cloud-cli-0.1.6.tgz \
   <sha256>
 ```
 
@@ -68,7 +68,7 @@ bunx shelly-cloud-cli --help
 If Bun returns a stale cached version for the shorthand command, verify the exact published package version explicitly:
 
 ```bash
-bunx --package shelly-cloud-cli@0.1.5 shelly-cloud --version
+bunx --package shelly-cloud-cli@0.1.6 shelly-cloud --version
 ```
 
 You can also clear or refresh Bun's package cache before retrying the shorthand form.
