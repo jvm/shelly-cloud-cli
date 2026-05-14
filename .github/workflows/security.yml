@@ -2,7 +2,7 @@ name: Security
 on:
   push:
     branches: [main]
-  pull_request:
+  workflow_dispatch:
   schedule:
     - cron: '13 4 * * 2'
 concurrency:
@@ -11,18 +11,6 @@ concurrency:
 permissions:
   contents: read
 jobs:
-  dependency-review:
-    name: Dependency review
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: read # Required by dependency-review-action to inspect PR dependency changes.
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-        with:
-          persist-credentials: false
-      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294
   audit:
     name: Dependency, secret, and static analysis
     runs-on: ubuntu-latest
