@@ -1,0 +1,42 @@
+name: Bug report
+description: Report a reproducible problem with shelly-cloud-cli
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include `SHELLY_CLOUD_KEY`, auth keys, private hosts, or full device inventories.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include commands with secrets and private identifiers redacted.
+      placeholder: |
+        1. Run `shelly-cloud ...`
+        2. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: CLI version
+      placeholder: shelly-cloud --version
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node/Bun versions, install method.
