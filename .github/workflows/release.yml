@@ -1,0 +1,103 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  publish:
+    name: Publish npm and GitHub release
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write # Required to create/update the GitHub release.
+      id-token: write # Required for npm Trusted Publishing/OIDC.
+      attestations: write # Reserved for release artifact attestations.
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tarball: ${{ steps.meta.outputs.tarball }}
+      sha256: ${{ steps.meta.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+          registry-url: https://registry.npmjs.org
+      - run: npm install -g npm@latest
+      - run: bun install --frozen-lockfile
+      - run: bun run typecheck
+      - run: bun test
+      - run: bun run build
+      - run: bun run pack:check
+      - name: Pack npm tarball
+        run: |
+          npm pack
+          shasum -a 256 -- ./*.tgz > checksums.txt
+      - id: meta
+        name: Collect artifact metadata
+        run: |
+          {
+            version="${GITHUB_REF_NAME#v}"
+            tarball="shelly-cloud-cli-${version}.tgz"
+            sha256="$(awk '{print $1}' checksums.txt)"
+            echo "version=${version}"
+            echo "tarball=${tarball}"
+            echo "sha256=${sha256}"
+          } >> "$GITHUB_OUTPUT"
+      - name: Upload GitHub release artifacts
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
+        with:
+          files: |
+            *.tgz
+            checksums.txt
+      - name: Publish to npm with Trusted Publishing
+        run: npm publish
+  homebrew:
+    name: Open Homebrew tap pull request
+    needs: publish
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          path: source
+          persist-credentials: false
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          repository: jvm/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: tap
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Generate formula
+        working-directory: tap
+        env:
+          VERSION: ${{ needs.publish.outputs.version }}
+          TARBALL: ${{ needs.publish.outputs.tarball }}
+          SHA256: ${{ needs.publish.outputs.sha256 }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          scripts/render-shelly-cloud-cli-formula.sh \
+            "$VERSION" \
+            "https://github.com/jvm/shelly-cloud-cli/releases/download/${REF_NAME}/${TARBALL}" \
+            "$SHA256"
+      - name: Create Homebrew tap pull request
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c
+        with:
+          path: tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          branch: update-shelly-cloud-cli-${{ needs.publish.outputs.version }}
+          title: Update shelly-cloud-cli to ${{ needs.publish.outputs.version }}
+          commit-message: Update shelly-cloud-cli to ${{ needs.publish.outputs.version }}
+          body: Updates shelly-cloud-cli formula from jvm/shelly-cloud-cli release ${{ github.ref_name }}.

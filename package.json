@@ -1,0 +1,42 @@
+{
+  "name": "shelly-cloud-cli",
+  "version": "0.1.0",
+  "description": "Agent-native CLI for Shelly Cloud Control API v2",
+  "type": "module",
+  "bin": {
+    "shelly-cloud": "./dist/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvm/shelly-cloud-cli.git"
+  },
+  "license": "MIT",
+  "author": "Joshua Mocito",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    "CONFORMANCE.md",
+    "docs",
+    "skills/SKILL.md"
+  ],
+  "scripts": {
+    "build": "tsc && node scripts/fix-bin-mode.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "format:check": "node scripts/format-check.mjs",
+    "test": "bun test",
+    "pack:check": "npm pack --dry-run",
+    "install:check": "node scripts/install-check.mjs",
+    "smoke": "bun run build && node dist/cli.js --help >/dev/null && node dist/cli.js --version >/dev/null && node dist/cli.js agent-context --json >/dev/null",
+    "test:integration": "bun test test/integration.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,6 @@
+rules:
+  cache-poisoning:
+    ignore:
+      # Release jobs intentionally install runtime toolchains from pinned setup actions
+      # without dependency caches. Release builds still use frozen lockfiles.
+      - release.yml

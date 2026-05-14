@@ -1,0 +1,74 @@
+name: Security
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '13 4 * * 2'
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # Required by dependency-review-action to inspect PR dependency changes.
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48
+  audit:
+    name: Dependency, secret, and static analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+      - run: bun install --frozen-lockfile
+      - run: npm audit --audit-level=low
+      - name: Semgrep
+        run: |
+          python3 -m pip install --user semgrep
+          "${HOME}/.local/bin/semgrep" scan --config p/javascript --error
+      - name: TruffleHog
+        uses: trufflesecurity/trufflehog@6c542a5ae69ddd1214cb9dcb57ec2efbaf9ee42d
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified
+  workflow-lint:
+    name: Workflow lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: rhysd/actionlint@a443f344ff32813837fa49f7aa6cbc478d770e62
+      - name: zizmor
+        uses: zizmorcore/zizmor-action@5ca5fc7a4779c5263a3ffa0e1f693009994446d1
+        with:
+          persona: auditor
+          min-severity: high
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - name: Run ShellCheck when shell scripts are present
+        run: |
+          mapfile -t scripts < <(find . -type f -name '*.sh' -not -path './node_modules/*')
+          if [ "${#scripts[@]}" -eq 0 ]; then
+            echo "No shell scripts found"
+          else
+            shellcheck "${scripts[@]}"
+          fi
