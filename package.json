@@ -1,6 +1,6 @@
 {
   "name": "shelly-cloud-cli",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Agent-native CLI for Shelly Cloud Control API v2",
   "type": "module",
   "bin": {
