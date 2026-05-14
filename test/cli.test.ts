@@ -12,7 +12,7 @@ function run(args: string[], env: Record<string, string> = {}, input?: string) {
 describe('cli basics', () => {
   test('help and version', () => {
     expect(run(['--help']).status).toBe(0);
-    expect(run(['--version']).stdout.trim()).toMatch(/^0\.1\.1/);
+    expect(run(['--version']).stdout.trim()).toMatch(/^0\.1\.2/);
   });
 
   test('json validation errors go to stderr', () => {

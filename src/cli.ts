@@ -14,7 +14,7 @@ import type { DeviceAlias, Idempotency } from './types.js';
 import { parseBool, parseCsv, parseIntRange, parsePositiveNumber } from './util/parse.js';
 import { redact } from './util/redact.js';
 
-const VERSION = '0.1.1';
+const VERSION = '0.1.2';
 
 interface Parsed { globals: GlobalOptions; args: string[]; flags: Map<string, string[]>; positionals: string[] }
 
