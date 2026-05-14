@@ -2,6 +2,8 @@
 
 This project publishes a Node-compatible npm artifact and a Homebrew formula for `jvm/tap`.
 
+Status: validated through automated release `v0.1.8`.
+
 ## Before tagging
 
 1. Run local checks:
@@ -22,9 +24,10 @@ This project publishes a Node-compatible npm artifact and a Homebrew formula for
    bun run test:integration
    ```
 
-3. Confirm npm Trusted Publishing is configured for `jvm/shelly-cloud-cli` and `.github/workflows/release.yml`.
+3. Confirm npm Trusted Publishing is configured for `jvm/shelly-cloud-cli` and workflow filename `release.yml`.
 4. Confirm protected release environment `release` exists.
-5. Confirm `HOMEBREW_TAP_TOKEN` is scoped only to `jvm/homebrew-tap` if using automated tap updates.
+5. Confirm `RELEASE_TOKEN` is set on the `release` environment for GitHub release creation if the default workflow token is insufficient.
+6. Confirm `HOMEBREW_TAP_TOKEN` is scoped only to `jvm/homebrew-tap` if using automated tap updates.
 
 ## Tag and release
 
@@ -36,6 +39,19 @@ Create a protected `v*` tag. The release workflow:
 - uploads the npm tarball and checksums to GitHub Releases
 - publishes to npm through Trusted Publishing/OIDC
 - opens a Homebrew tap pull request when `HOMEBREW_TAP_TOKEN` is available
+
+The release workflow now:
+
+- uses `RELEASE_TOKEN` for GitHub release creation when present
+- publishes to npm with OIDC-first `npm publish --provenance`
+- creates or updates release assets idempotently
+- opens the Homebrew PR with `gh pr create`
+
+Current repository protection posture:
+
+- `main` branch protection: no force-push, no deletion, linear history required
+- tag ruleset: protects `refs/tags/v*` with maintainer bypass only
+- workflow permissions default: `write`
 
 ## Homebrew formula mode
 

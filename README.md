@@ -2,6 +2,8 @@
 
 Agent-native CLI for querying and controlling known Shelly Cloud devices through the Shelly Cloud Control API v2.
 
+Current stable release: `0.1.8`.
+
 ⚠️ This tool can cause physical side effects in a home. Use `--dry-run` before mutating commands and be careful with covers, lights, switches, and groups.
 
 ## Install
@@ -52,7 +54,7 @@ Exit codes: 0 success, 1 unexpected, 2 usage/validation, 3 configuration/authent
 
 Verification with `--verify` is best-effort and inspects common status fields only. See [`docs/verification.md`](docs/verification.md).
 
-Release and Homebrew details are in [`docs/release.md`](docs/release.md). Current pre-release conformance status is in [`CONFORMANCE.md`](CONFORMANCE.md).
+Release and Homebrew details are in [`docs/release.md`](docs/release.md). Current conformance status is in [`CONFORMANCE.md`](CONFORMANCE.md). See [`CHANGELOG.md`](CHANGELOG.md) for release highlights.
 
 Core auth-key mode does not support remote discovery. `devices list` shows local aliases only.
 

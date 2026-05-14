@@ -1,6 +1,6 @@
 # Conformance audit
 
-Status: pre-release audit snapshot. The implementation is close to core conformance, but release-only checks cannot be complete until an npm/GitHub/Homebrew release is executed.
+Status: post-release audit snapshot. Automated release `v0.1.8` successfully created GitHub release assets, published to npm via OIDC trusted publishing, and opened the Homebrew tap PR which was then merged and installed locally.
 
 ## MUST / required behavior traceability
 
@@ -33,21 +33,20 @@ Status: pre-release audit snapshot. The implementation is close to core conforma
 | Skill manifest | Packaged `skills/SKILL.md` and `skill-path` | Done | `skills/SKILL.md`, tests, package files |
 | Feedback | Local redacted feedback; send reports not configured | Done | `src/cli.ts` |
 | Packaging content | Exclude tests/env/local state/cache; include docs/spec/skill | Done | `package.json` files, `bun run pack:check` |
-| Install modes | npm/Bun/pnpm local tarball install smoke; npm-exec one-shot local equivalent | Mostly done | `bun run install:check`; published npx/bunx pending |
+| Install modes | npm/Bun/pnpm local tarball install smoke; npm-exec one-shot local equivalent | Done/limited | `bun run install:check`; published `npx` and explicit-version `bunx` checks pass; plain `bunx` may serve stale local cache |
 | CI gates | install, typecheck, lint, format, test, build, smoke, package/install check | Done | `.github/workflows/ci.yml` |
 | Security gates | audit, dependency review, secret scan, Semgrep, CodeQL, actionlint, zizmor, ShellCheck | Done locally / CI configured | workflows; `actionlint` and `zizmor --min-severity high` pass locally |
-| Release workflow | Protected release env, npm OIDC, GitHub release artifacts/checksums, Homebrew PR | Configured | `.github/workflows/release.yml`; unexercised until tag |
-| Homebrew tap | Formula renderer and PR workflow target `jvm/homebrew-tap` | Configured | `../homebrew-tap/scripts/render-shelly-cloud-cli-formula.sh`, release workflow |
-| Live integration | Opt-in live read; mutation gated by explicit env var | Configured | `test/integration.test.ts`; skipped without credentials |
+| Release workflow | Protected release env, npm OIDC, GitHub release artifacts/checksums, Homebrew PR | Done | `.github/workflows/release.yml`; validated by `v0.1.8` |
+| Homebrew tap | Formula renderer and PR workflow target `jvm/homebrew-tap` | Done | tap PR created/merged for `0.1.8`; local `brew upgrade` verified |
+| Live integration | Opt-in live read; mutation gated by explicit env var | Done/limited | `test/integration.test.ts`; live read passed locally, mutation remains intentionally gated |
 
-## Release-blocking checks that require external state
+## External checks and remaining operational follow-up
 
-- npm Trusted Publisher must be configured for `jvm/shelly-cloud-cli` and `.github/workflows/release.yml`.
-- Protected GitHub environment `release` must exist.
-- `HOMEBREW_TAP_TOKEN` must be scoped only to `jvm/homebrew-tap`.
-- A protected `v*` release tag must exercise npm publish, GitHub release artifacts, and Homebrew PR creation.
-- Published `npx shelly-cloud-cli --help` and `bunx shelly-cloud-cli --help` must pass after npm publish.
-- Live `bun run test:integration` must pass when `SHELLY_CLOUD_KEY`, `SHELLY_CLOUD_HOST`, and `SHELLY_TEST_DEVICE_ID` are available.
+- Published `npx --yes shelly-cloud-cli@0.1.8 --version` passes.
+- Explicit-version `bunx --package shelly-cloud-cli@0.1.8 shelly-cloud --version` passes.
+- Plain `bunx shelly-cloud-cli` may need cache refresh on individual machines.
+- Live `bun run test:integration` read path has passed locally with valid environment variables; mutation remains intentionally gated behind `SHELLY_TEST_ENABLE_MUTATION=1`.
+- Branch/tag/release protections should be reviewed periodically as GitHub platform defaults evolve.
 
 ## Accepted limitations / deferred items
 
