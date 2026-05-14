@@ -4,7 +4,7 @@
   "description": "Agent-native CLI for Shelly Cloud Control API v2",
   "type": "module",
   "bin": {
-    "shelly-cloud": "./dist/cli.js"
+    "shelly-cloud": "dist/cli.js"
   },
   "repository": {
     "type": "git",
