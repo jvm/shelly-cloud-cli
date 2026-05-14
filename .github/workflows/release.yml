@@ -113,13 +113,27 @@ jobs:
             "$VERSION" \
             "https://github.com/jvm/shelly-cloud-cli/releases/download/${REF_NAME}/${TARBALL}" \
             "$SHA256"
-      - name: Create Homebrew tap pull request
+      - name: Commit and open Homebrew tap pull request
         if: ${{ env.HOMEBREW_TAP_TOKEN != '' }}
-        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c
-        with:
-          path: tap
-          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
-          branch: update-shelly-cloud-cli-${{ needs.publish.outputs.version }}
-          title: Update shelly-cloud-cli to ${{ needs.publish.outputs.version }}
-          commit-message: Update shelly-cloud-cli to ${{ needs.publish.outputs.version }}
-          body: Updates shelly-cloud-cli formula from jvm/shelly-cloud-cli release ${{ github.ref_name }}.
+        working-directory: tap
+        env:
+          GH_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
+          BRANCH_NAME: update-shelly-cloud-cli-${{ needs.publish.outputs.version }}
+          PR_TITLE: Update shelly-cloud-cli to ${{ needs.publish.outputs.version }}
+          PR_BODY: Updates shelly-cloud-cli formula from jvm/shelly-cloud-cli release ${{ github.ref_name }}.
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH_NAME"
+          git add Formula/shelly-cloud-cli.rb
+          if git diff --cached --quiet; then
+            echo "No Homebrew tap changes to commit."
+            exit 0
+          fi
+          git commit -m "$PR_TITLE"
+          git push --force-with-lease origin "$BRANCH_NAME"
+          if gh pr list --repo jvm/homebrew-tap --head "$BRANCH_NAME" --json number --jq '.[0].number' | grep -q '[0-9]'; then
+            echo "Pull request already exists for $BRANCH_NAME"
+          else
+            gh pr create --repo jvm/homebrew-tap --base main --head "$BRANCH_NAME" --title "$PR_TITLE" --body "$PR_BODY"
+          fi
