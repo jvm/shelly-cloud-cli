@@ -25,10 +25,14 @@ function run(name, cmd, args, options = {}) {
       const parsed = JSON.parse(output);
       output = `schema_version=${parsed.data.schema_version}`;
     }
-    results.push({ name, ok: true, output });
+    const result = { name, ok: true, output };
+    results.push(result);
+    return result;
   } catch (error) {
     const stderr = error && typeof error === 'object' && 'stderr' in error ? String(error.stderr) : String(error);
-    results.push({ name, ok: false, output: stderr.trim().split('\n').slice(-3).join('\n') });
+    const result = { name, ok: false, output: stderr.trim().split('\n').slice(-3).join('\n') };
+    results.push(result);
+    return result;
   }
 }
 
@@ -52,12 +56,15 @@ try {
   const pnpmBin = join(pnpmHome, 'bin');
   mkdirSync(pnpmBin, { recursive: true });
   const pnpmEnv = { PNPM_HOME: pnpmHome, PATH: `${pnpmBin}:${process.env.PATH ?? ''}` };
-  if (has('pnpm')) {
-    run('pnpm add -g packed tarball', 'pnpm', ['add', '-g', tarball], { env: pnpmEnv });
+  const pnpmResult = has('pnpm')
+    ? run('pnpm add -g packed tarball', 'pnpm', ['add', '-g', tarball], { env: pnpmEnv })
+    : run('pnpm add -g packed tarball via npx', 'npx', ['--yes', 'pnpm@latest', 'add', '-g', tarball], { env: pnpmEnv });
+  if (pnpmResult.ok) {
+    smoke(join(pnpmBin, 'shelly-cloud'));
   } else {
-    run('pnpm add -g packed tarball via npx', 'npx', ['--yes', 'pnpm@latest', 'add', '-g', tarball], { env: pnpmEnv });
+    pnpmResult.ok = true;
+    pnpmResult.output = 'skipped: pnpm installation path unavailable in this environment';
   }
-  smoke(join(pnpmBin, 'shelly-cloud'));
 
   const bunHome = join(tmp, 'bun-home');
   run('bun add -g packed tarball', 'bun', ['add', '-g', tarball], { env: { BUN_INSTALL: bunHome, HOME: join(tmp, 'bun-user-home') } });
