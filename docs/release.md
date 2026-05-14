@@ -64,3 +64,11 @@ After npm publish, verify one-shot execution:
 npx shelly-cloud-cli --help
 bunx shelly-cloud-cli --help
 ```
+
+If Bun returns a stale cached version for the shorthand command, verify the exact published package version explicitly:
+
+```bash
+bunx --package shelly-cloud-cli@0.1.5 shelly-cloud --version
+```
+
+You can also clear or refresh Bun's package cache before retrying the shorthand form.

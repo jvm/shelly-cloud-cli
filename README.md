@@ -67,6 +67,6 @@ bun run smoke
 bun run install:check
 ```
 
-`bun run install:check` builds and packs the CLI, then installs the local tarball into temporary npm, pnpm, and Bun global prefixes, runs binary smoke checks, and uses `npm exec --package <tarball>` as the local `npx` equivalent. `bunx shelly-cloud-cli` is verified after publish because Bun does not reliably execute local npm tarballs through `bunx`.
+`bun run install:check` builds and packs the CLI, then installs the local tarball into temporary npm, pnpm, and Bun global prefixes, runs binary smoke checks, and uses `npm exec --package <tarball>` as the local `npx` equivalent. `bunx shelly-cloud-cli` is verified after publish because Bun does not reliably execute local npm tarballs through `bunx`. If Bun serves a stale cached version after publish, use `bunx --package shelly-cloud-cli@<version> shelly-cloud --version` to confirm the exact published package.
 
 Implementation decisions: Node-compatible npm artifact (`dist/cli.js`) with `#!/usr/bin/env node`, Bun >=1.2 for development, zero runtime dependencies, HTTPS-only host policy, no redirects, 1 MiB group input limit, group `--force` threshold of 3 targets, local feedback only.
