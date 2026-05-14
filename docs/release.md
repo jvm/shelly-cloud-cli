@@ -44,8 +44,8 @@ The v1 formula is Node-based. It installs the GitHub release npm tarball with Ho
 Generate a local formula preview:
 
 ```bash
-node scripts/homebrew-formula.mjs 0.1.3 \
-  https://github.com/jvm/shelly-cloud-cli/releases/download/v0.1.3/shelly-cloud-cli-0.1.3.tgz \
+node scripts/homebrew-formula.mjs 0.1.4 \
+  https://github.com/jvm/shelly-cloud-cli/releases/download/v0.1.4/shelly-cloud-cli-0.1.4.tgz \
   <sha256>
 ```
 
