@@ -41,7 +41,7 @@ jobs:
           persist-credentials: false
       - uses: rhysd/actionlint@a443f344ff32813837fa49f7aa6cbc478d770e62
       - name: zizmor
-        uses: zizmorcore/zizmor-action@5ca5fc7a4779c5263a3ffa0e1f693009994446d1
+        uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d
         with:
           persona: auditor
           min-severity: high
