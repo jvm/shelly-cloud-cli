@@ -24,7 +24,7 @@ jobs:
       tarball: ${{ steps.meta.outputs.tarball }}
       sha256: ${{ steps.meta.outputs.sha256 }}
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
@@ -84,12 +84,12 @@ jobs:
       - name: Skip Homebrew tap update
         if: ${{ env.HOMEBREW_TAP_TOKEN == '' }}
         run: echo "HOMEBREW_TAP_TOKEN is not configured; skipping tap update."
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         if: ${{ env.HOMEBREW_TAP_TOKEN != '' }}
         with:
           path: source
           persist-credentials: false
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         if: ${{ env.HOMEBREW_TAP_TOKEN != '' }}
         with:
           repository: jvm/homebrew-tap
