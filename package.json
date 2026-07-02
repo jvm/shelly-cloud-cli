@@ -37,7 +37,7 @@
     "test:integration": "bun test test/integration.test.ts"
   },
   "devDependencies": {
-    "@types/node": "^22.15.17",
+    "@types/node": "^26.1.0",
     "typescript": "^5.8.3"
   }
 }
